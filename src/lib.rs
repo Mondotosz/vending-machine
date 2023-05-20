@@ -1,13 +1,18 @@
+pub mod article;
 #[cfg(test)]
 mod tests;
-pub mod article;
+pub mod timestamp;
 
 use crate::article::Article;
+use crate::timestamp::Timestamp;
+use time::OffsetDateTime;
 
 pub struct VendingMachine {
     articles: Vec<Article>,
-    balance: f32, // Gains from sold articles
-    change: f32,  // Currently inserted money
+    balance: f32,          // Gains from sold articles
+    change: f32,           // Currently inserted money
+    timestamps: [f32; 24], // Index
+    time: Option<OffsetDateTime>,
 }
 
 impl VendingMachine {
@@ -16,6 +21,8 @@ impl VendingMachine {
             articles,
             balance: 0.0,
             change: 0.0,
+            timestamps: [0.0; 24],
+            time: None,
         }
     }
 
@@ -47,6 +54,16 @@ impl VendingMachine {
         self.balance += article.price;
         self.change -= article.price;
 
+        // Get specified time or current utc time
+        let hour = match self.time {
+            Some(time) => time,
+            None => OffsetDateTime::now_utc(),
+        }
+        .hour();
+
+        // Add timestamp
+        self.timestamps[hour as usize] += article.price;
+
         return format!("Vending {}", article.name);
     }
 
@@ -58,5 +75,25 @@ impl VendingMachine {
     // Get the amount of money the machine has earned
     pub fn get_balance(&self) -> f32 {
         self.balance
+    }
+
+    pub fn set_time(&mut self, time: OffsetDateTime) {
+        self.time = Some(time);
+    }
+
+    pub fn get_time(&self) -> Option<OffsetDateTime> {
+        self.time
+    }
+
+    pub fn get_timestamps(&self) -> Vec<Timestamp> {
+        self.timestamps
+            .clone()
+            .iter()
+            .enumerate()
+            .map(|(index, value)| Timestamp {
+                hour: index as u8,
+                amount: *value,
+            })
+            .collect()
     }
 }
