@@ -5,13 +5,15 @@ pub mod timestamp;
 
 use crate::article::Article;
 use crate::timestamp::Timestamp;
+use rust_decimal::Decimal;
+use rust_decimal_macros::dec;
 use time::OffsetDateTime;
 
 pub struct VendingMachine {
     articles: Vec<Article>,
-    balance: f32,          // Gains from sold articles
-    change: f32,           // Currently inserted money
-    timestamps: [f32; 24], // Index
+    balance: Decimal,          // Gains from sold articles
+    change: Decimal,           // Currently inserted money
+    timestamps: [Decimal; 24], // Index
     time: Option<OffsetDateTime>,
 }
 
@@ -19,14 +21,14 @@ impl VendingMachine {
     pub fn new(articles: Vec<Article>) -> VendingMachine {
         VendingMachine {
             articles,
-            balance: 0.0,
-            change: 0.0,
-            timestamps: [0.0; 24],
+            balance: dec!(0.0),
+            change: dec!(0.0),
+            timestamps: [dec!(0.0); 24],
             time: None,
         }
     }
 
-    pub fn insert(&mut self, amount: f32) {
+    pub fn insert(&mut self, amount: Decimal) {
         self.change += amount;
     }
 
@@ -68,12 +70,12 @@ impl VendingMachine {
     }
 
     // Get the amount of money inserted which hasn't been used yet
-    pub fn get_change(&self) -> f32 {
+    pub fn get_change(&self) -> Decimal {
         self.change
     }
 
     // Get the amount of money the machine has earned
-    pub fn get_balance(&self) -> f32 {
+    pub fn get_balance(&self) -> Decimal {
         self.balance
     }
 

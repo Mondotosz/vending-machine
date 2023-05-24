@@ -1,12 +1,13 @@
+use rust_decimal::Decimal;
 pub struct Article {
     pub name: String,
     pub code: String,
     pub quantity: u32,
-    pub price: f32, // potential issue. Using i32 and cents would prevent rounding errors
+    pub price: Decimal, // potential issue. Using i32 and cents would prevent rounding errors
 }
 
 impl Article {
-    pub fn new(code: String, name: String, quantity: u32, price: f32) -> Article {
+    pub fn new(code: String, name: String, quantity: u32, price: Decimal) -> Article {
         Article {
             code,
             name,
